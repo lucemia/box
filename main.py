@@ -66,7 +66,7 @@ def check_all_boxes_ok(c_width, c_height, c_depth, boxes):
 
     for box in boxes:
         # check box setting correct
-        if not (box.x >= 0 and (box.width + box.x) <= c_wdith) and box.width > 0:
+        if not (box.x >= 0 and (box.width + box.x) <= c_width) and box.width > 0:
             return False
         if not (box.y >= 0 and (box.height + box.y) <= c_height) and box.height > 0:
             return False
@@ -96,3 +96,4 @@ def check_gravity_stable(c_width, c_height, c_depth, boxes):
 
         return False
 
+    return True
