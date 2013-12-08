@@ -47,9 +47,31 @@ def calculate_weight_distribution(box, overlap_planes):
     # TODO: need to work on
     return [float(box.weight) / len(overlap_planes) for k in overlap_planes]
 
+def calculate_mass_center_in_support_plan(box, overlap_planes):
+    # calculate convex hull from overlap planes
+    # check box's mass center in the poly
+
+    from scipy.spatial import ConvexHull
+    import matplotlib.nxutils as nx
+
+    points = []
+    for left, right, top, bottom in overlap_planes:
+        points.extend([
+            (left, top),
+            (left, bottom),
+            (right, top),
+            (right, bottom)
+        ])
+
+    hull = ConvexHull(points)
+    r = nx.pnpoly(box.center_x, box.center_y, hull)
+    return r and True
+
 def update_box_status(box, boxes):
     support_boxes = [k for k in boxes if k.can_support()]
     overlap_planes = [k.overlap_plane(box) for k in boxes]
+
+    calculate_center_is_cover(box, overlap_planes)
 
     weights = calculate_weight_distribution(box, overlap_planes)
 
