@@ -25,13 +25,20 @@ class Box(object):
         self.weight += weight
 
     def can_support(self, box):
+        # FIXME: algorithm not correct
         # raft check this box can support another box
         # which means they have intercept in a z-index
         if box.z != self.z + self.depth:
             return False
-        if (box.x - self.x) * (box.x + box.width - self.x - self.width) > 0:
+
+        xs = [(box.x, 'x'), (box.x + box.width,'x'), (self.x, 'y'), (self.width, 'y')]
+        xs.sort(key=lambda i:i[0])
+        if xs[0][1] == xs[1][1]:
             return False
-        if (box.y - self.y) * (box.y + box.height - self.y - self.height) > 0:
+
+        ys = [(box.y, 'x'), (box.y + box.height, 'x'), (self.y, 'y'), (self.y + self.height, 'y')]
+        ys.sort(key=lambda i:i[0])
+        if ys[0][1] == ys[1][1]:
             return False
 
         return True
@@ -130,6 +137,9 @@ def check_gravity_stable(c_width, c_height, c_depth, boxes):
         return False
 
     return True
+
+
+# def place_box(boxes, genes):
 
 
 
