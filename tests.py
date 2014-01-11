@@ -42,6 +42,20 @@ class BoxTest(unittest.TestCase):
         ws = calculate_weight_distribution(box, planes)
         self.assertIsNone(ws)
 
+        box = Box(3, 3, 3, 1, 0, 0, 0)
+
+        planes = [
+            [1, 2, 1, 2]
+        ]
+        ws = calculate_weight_distribution(box, planes)
+
+        planes = [
+            [0, 1, 0, 1],
+            [1, 2, 1, 2],
+            [2, 3, 2, 3]
+        ]
+        ws = calculate_weight_distribution(box, planes)
+
     def testUnitbox(self):
         boxes = []
         for x in range(10):

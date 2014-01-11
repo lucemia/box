@@ -75,18 +75,32 @@ def calculate_weight_distribution(box, overlap_planes):
     # the basic equation
     eq0 = Eq(sum(ws), box.weight)
 
-    x,y = box.center_x, box.center_y
-    print x, y
-    # the x-axis balance equation
-    eq1 = Eq(sum([(w * ((p[0]+p[1]) / 2.0 - x)) for p, w in zip(overlap_planes, ws)]), 0)
-    eq2 = Eq(sum([(w * ((p[2]+p[3]) / 2.0 - y)) for p, w in zip(overlap_planes, ws)]), 0)
+    x, y = box.center_x, box.center_y
 
-    print 'w:', eq0
-    print 'x:', eq1
-    print 'y:', eq2
+    plane_centers = [((p[0] + p[1]) / 2.0 - x, (p[2] + p[3]) / 2.0 - y) for p in overlap_planes]
+
+    line_eqs = [[0, 1], [1, 0]]
+    [line_eqs.append((1, k)) for k in range(1, len(overlap_planes) + 2)]
+
+    distance = lambda a, b, x0, y0: (a*x0 + b*y0) / (a**2 + b**2) ** .5
+
+    eqs = [eq0]
+    for a, b in line_eqs:
+        eq = Eq(sum([(w * distance(a, b, p[0], p[1])) for p, w in zip(plane_centers, ws)]), 0)
+        if eq != True:
+            # ignore no use equation
+            eqs.append(eq)
+
+    # eq1 = Eq(sum([(w * p[0]) for p, w in zip(plane_centers, ws)]), 0)
+    # eq2 = Eq(sum([(w * p[1]) for p, w in zip(plane_centers, ws)]), 0)
+
+    # print 'w:', eq0
+    # print 'x:', eq1
+    # print 'y:', eq2
+    print eqs
 
     try:
-        results = solve([eq0, eq1, eq2], ws)
+        results = solve(eqs, ws)
         print 'solve:', results
 
         assert results != []
