@@ -68,7 +68,35 @@ def calculate_weight_distribution(box, overlap_planes):
         計算需要支撐目標貨物, 各支點需要負擔的重量
     """
     # TODO: need to work on
-    return [float(box.weight) / len(overlap_planes) for k in overlap_planes]
+    from sympy import *
+    # create variable
+    ws = symbols('w:%s' % len(overlap_planes))
+
+    # the basic equation
+    eq0 = Eq(sum(ws), box.weight)
+
+    x,y = box.center_x, box.center_y
+    print x, y
+    # the x-axis balance equation
+    eq1 = Eq(sum([(w * ((p[0]+p[1]) / 2.0 - x)) for p, w in zip(overlap_planes, ws)]), 0)
+    eq2 = Eq(sum([(w * ((p[2]+p[3]) / 2.0 - y)) for p, w in zip(overlap_planes, ws)]), 0)
+
+    print 'w:', eq0
+    print 'x:', eq1
+    print 'y:', eq2
+
+    try:
+        results = solve([eq0, eq1, eq2], ws)
+        print 'solve:', results
+
+        assert results != []
+
+        return [results[w] for w in ws]
+    except Exception as e:
+        logging.error(e)
+        return None
+
+    # return [float(box.weight) / len(overlap_planes) for k in overlap_planes]
 
 def calculate_mass_center_in_support_plan(box, overlap_planes):
     """
