@@ -6,22 +6,23 @@ class BoxTest(unittest.TestCase):
         pass
 
     def testWeightDistributionCalculation(self):
+        #weight=1,width, height, depth=2
         box = Box(2, 2, 2, 1, 0, 0, 0)
 
-        # test
+        #test 1 box
         planes = [[0, 1, 0, 1]]
         w = calculate_weight_distribution(box, planes)
         self.assertIsNone(w)
 
-        # test
+        #test 2 box
         planes = [
             [0 ,1, 0, 1],
             [1 ,2 ,1 ,2]
         ]
         w0, w1 = calculate_weight_distribution(box, planes)
-        self.assertEqual(w0, 0.5)
+        self.assertEqual(w0, 0.5)#unittest
         self.assertEqual(w1, 0.5)
-
+        #test 3 box
         planes = [
             [0, 1, 0, 1],
             [1, 2, 1, 2],
@@ -32,7 +33,7 @@ class BoxTest(unittest.TestCase):
         self.assertEqual(w1, 0.5)
         self.assertEqual(w2, 0)
 
-        # test
+        # test 4 box
         planes = [
             [0, 1, 0, 1],
             [1, 2, 1, 2],
@@ -64,7 +65,7 @@ class BoxTest(unittest.TestCase):
                     boxes.append(Box(1, 1, 1, 1, x, y, z))
 
 
-        # self.assertTrue(check_gravity_stable(10, 10, 10, boxes))
+                    # self.assertTrue(check_gravity_stable(10, 10, 10, boxes))
 
 if __name__ == '__main__':
     unittest.main()
