@@ -50,7 +50,7 @@ class Box(object):
         if box.z != self.z + self.depth:
             return False
 
-        xs = [(box.x, 'x'), (box.x + box.width,'x'), (self.x, 'y'), (self.width, 'y')]
+        xs = [(box.x, 'x'), (box.x + box.width,'x'), (self.x, 'y'), (self.x + self.width, 'y')]
         xs.sort(key=lambda i:i[0])
         if xs[0][1] == xs[1][1]:
             return False
