@@ -63,11 +63,17 @@ class Box(object):
 
         return xs[1], xs[2], ys[1], ys[2]
 
+
+def arm(a, b, c, x, y):
+    return (a*x + b * y + c) / (a**2 + b**2) ** .5
+
 def calculate_weight_distribution(box, overlap_planes):
     """
         計算需要支撐目標貨物, 各支點需要負擔的重量
     """
-    # TODO: need to work on
+    # TODO: need to work on 無窮解的情況
+    # TODO: 考慮面有包含重心的情況
+
     from sympy import *
     # create variable
     # the basic equation
@@ -234,8 +240,4 @@ def check_gravity_stable(c_width, c_height, c_depth, boxes):
         return False
 
     return True
-
-
-# def place_box(boxes, genes):
-
 
