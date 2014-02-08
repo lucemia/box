@@ -25,14 +25,14 @@ class Box(object):
             計算目前貨物上方如果在 (x,y) 坐標被施加了 weight的力量, 對貨物的重心產生的影響
         """
         # calculate center_x, center_y offset while the box need to support other box
-        self.center_x = (self.center_x * self.weight + x * weight) / (self.weight + weight)
-        self.center_y = (self.center_y * self.weight + y * weight) / (self.weight + weight)
+        self.center_x = float(self.center_x * self.weight + x * weight) / (self.weight + weight)
+        self.center_y = float(self.center_y * self.weight + y * weight) / (self.weight + weight)
 
         self.weight += weight
 
     def can_support(self, box):
         """
-            計算目前
+            計算目前箱子是否能夠支撐box
         """
         # raft check this box can support another box
         # which means they have intercept in a z-index
