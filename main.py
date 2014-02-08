@@ -73,6 +73,7 @@ def calculate_weight_distribution(box, overlap_planes):
     """
     # TODO: need to work on 無窮解的情況
     # TODO: 考慮面有包含重心的情況
+    # http://www.auto-online.com.tw/bbs/board/5/68642?p=20
 
     from sympy import *
     # create variable
