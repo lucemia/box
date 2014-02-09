@@ -4,6 +4,12 @@ import logging
 
 # http://www.chronoengine.info/mediawiki/index.php/ChronoPyEngine:Demo_masonry
 # http://www.chronoengine.info/mediawiki/index.php/ChronoPyEngine:Introduction
+# to correct simulate physical, we may need finite method
+# http://stackoverflow.com/questions/501940/simple-simulations-for-physics-in-python
+# http://www.petercollingridge.co.uk/pygame-physics-simulation
+# http://showmedo.com/videotutorials/series?name=pythonthompsonvpythonseries
+# the issue called stable stacking in Physical
+# http://wenku.baidu.com/view/c2f2572dccbff121dd36835b.html
 
 class Box(object):
     """

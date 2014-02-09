@@ -1,3 +1,6 @@
+# -*- encoding=utf8 -*-
+
+
 import unittest
 from main import *
 

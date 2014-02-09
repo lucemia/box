@@ -46,93 +46,23 @@ brick_material.SetComplianceT(0.0000001)
 # brick_material.SetComplianceSpinning(0.0000001)
 
 
-
-# Create the set of bricks in a vertical stack, along Y axis
-
-def create_block(x, y, z, size_x, size_y, size_z, weight):
-    body_brick = chrono.ChBodyShared()
-
-    body_brick.SetPos(chrono.ChVectorD(x - size_x/2, y - size_y/2, z - size_z/2))
-    body_brick.SetMass(weight)
-    body_brick.SetMaterialSurface(brick_material)
-
-    body_brick.GetCollisionModel().ClearModel()
-    body_brick.GetCollisionModel().AddBox(size_x/2, size_y/2, size_z/2)
-    body_brick.GetCollisionModel().BuildModel()
-    body_brick.SetCollide(True)
-
-    body_brick_shape = chrono.ChBoxShapeShared()
-    body_brick_shape.GetBoxGeometry().Size = chrono.ChVectorD(size_x/2, size_y/2, size_z/2)
-    if y%2==0 :
-        body_brick_shape.SetColor(chrono.ChColor(0.65, 0.65, 0.6)) # set gray color only for odd bricks
-    body_brick.GetAssets().push_back(body_brick_shape)
-
-    return body_brick
-
-
-nbricks_on_x = 5
-nbricks_on_y = 6
-
-size_brick_x = 0.25
-size_brick_y = 0.12
-size_brick_z = 0.12
-density_brick = 1000;    # kg/m^3
-mass_brick = density_brick * size_brick_x * size_brick_y * size_brick_z;
-inertia_brick = 2/5*(pow(size_brick_x,2))*mass_brick; # to do: compute separate xx,yy,zz inertias
-
-for ix in range(0,nbricks_on_x):
-    for iy in range(0,nbricks_on_y):
-        body_brick = create_block(ix, iy, 0, size_brick_x, size_brick_y, size_brick_z, 1)
-
-        # # create it
-        # body_brick = chrono.ChBodyShared()
-        # # set initial position
-        # body_brick.SetPos(chrono.ChVectorD(ix*size_brick_x, (iy+0.5)*size_brick_y, 0 ))
-        # # set mass properties
-        # body_brick.SetMass(mass_brick)
-        # body_brick.SetInertiaXX(chrono.ChVectorD(inertia_brick,inertia_brick,inertia_brick))
-        # # set collision surface properties
-        # body_brick.SetMaterialSurface(brick_material)
-
-        # # Collision shape
-        # body_brick.GetCollisionModel().ClearModel()
-        # body_brick.GetCollisionModel().AddBox(size_brick_x/2, size_brick_y/2, size_brick_z/2) # must set half sizes
-        # body_brick.GetCollisionModel().BuildModel()
-        # body_brick.SetCollide(True)
-
-        # # Visualization shape, for rendering animation
-        # body_brick_shape = chrono.ChBoxShapeShared()
-        # body_brick_shape.GetBoxGeometry().Size = chrono.ChVectorD(size_brick_x/2, size_brick_y/2, size_brick_z/2)
-        # if iy%2==0 :
-        #     body_brick_shape.SetColor(chrono.ChColor(0.65, 0.65, 0.6)) # set gray color only for odd bricks
-        # body_brick.GetAssets().push_back(body_brick_shape)
-
-        # my_system.Add(body_brick)
-
-
-my_system.Add(create_block(0, 0, 0, 1, 1, 1, 1))
-my_system.Add(create_block(1, 0, 0, 1, 1, 1, 1))
-my_system.Add(create_block(0, 0, 1, 1, 1, 1, 1))
-my_system.Add(create_block(1, 0, 1, 1, 1, 1, 1))
-my_system.Add(create_block(0-0.1, 1, 0, 2, 1, 2, 1))
-
 # Create the room floor: a simple fixed rigid body with a collision shape
 # and a visualization shape
 
 body_floor = chrono.ChBodyShared()
 body_floor.SetBodyFixed(True)
-body_floor.SetPos(chrono.ChVectorD(0, -2, 0 ))
+body_floor.SetPos(chrono.ChVectorD(0, -2, 0))
 body_floor.SetMaterialSurface(brick_material)
 
 # Collision shape
 body_floor.GetCollisionModel().ClearModel()
-body_floor.GetCollisionModel().AddBox(3, 1, 3) # hemi sizes
+body_floor.GetCollisionModel().AddBox(10, 1, 10) # hemi sizes
 body_floor.GetCollisionModel().BuildModel()
 body_floor.SetCollide(True)
 
 # Visualization shape
 body_floor_shape = chrono.ChBoxShapeShared()
-body_floor_shape.GetBoxGeometry().Size = chrono.ChVectorD(3, 1, 3)
+body_floor_shape.GetBoxGeometry().Size = chrono.ChVectorD(10, 1, 10)
 body_floor.GetAssets().push_back(body_floor_shape)
 
 body_floor_texture = chrono.ChTextureShared()
@@ -143,103 +73,124 @@ my_system.Add(body_floor)
 
 
 
-# Create the shaking table, as a box
+def create_application():
+    # ---------------------------------------------------------------------
+    #
+    #  Create an Irrlicht application to visualize the system
+    #
 
-size_table_x = 1;
-size_table_y = 0.2;
-size_table_z = 1;
+    myapplication = chronoirr.ChIrrApp(my_system)
 
-body_table = chrono.ChBodyShared()
-body_table.SetPos(chrono.ChVectorD(0, -size_table_y/2, 0 ))
-body_table.SetMaterialSurface(brick_material)
+    myapplication.AddTypicalSky('../bin/data/skybox/')
+    myapplication.AddTypicalCamera(chronoirr.vector3df(0.5,0.5,1.0))
+    myapplication.AddLightWithShadow(chronoirr.vector3df(2,4,2),    # point
+                                     chronoirr.vector3df(0,0,0),    # aimpoint
+                                     9,                 # radius (power)
+                                     1,9,               # near, far
+                                     30)                # angle of FOV
 
-# Collision shape
-body_table.GetCollisionModel().ClearModel()
-body_table.GetCollisionModel().AddBox(size_table_x/2, size_table_y/2, size_table_z/2) # hemi sizes
-body_table.GetCollisionModel().BuildModel()
-body_table.SetCollide(True)
+                # ==IMPORTANT!== Use this function for adding a ChIrrNodeAsset to all items
+                # in the system. These ChIrrNodeAsset assets are 'proxies' to the Irrlicht meshes.
+                # If you need a finer control on which item really needs a visualization proxy in
+                # Irrlicht, just use application.AssetBind(myitem); on a per-item basis.
 
-# Visualization shape
-body_table_shape = chrono.ChBoxShapeShared()
-body_table_shape.GetBoxGeometry().Size = chrono.ChVectorD(size_table_x/2, size_table_y/2, size_table_z/2)
-body_table_shape.SetColor(chrono.ChColor(0.4,0.4,0.5))
-body_table.GetAssets().push_back(body_table_shape)
+    myapplication.AssetBindAll();
 
-body_table_texture = chrono.ChTextureShared()
-body_table_texture.SetTextureFilename('../bin/data/concrete.jpg')
-body_table.GetAssets().push_back(body_table_texture)
+                # ==IMPORTANT!== Use this function for 'converting' into Irrlicht meshes the assets
+                # that you added to the bodies into 3D shapes, they can be visualized by Irrlicht!
 
-# my_system.Add(body_table)
+    myapplication.AssetUpdateAll();
 
-
-# Create a constraint that blocks free 3 x y z translations and 3 rx ry rz rotations
-# of the table respect to the floor, and impose that the relative imposed position
-# depends on a specified motion law.
-
-link_shaker = chrono.ChLinkLockLockShared()
-link_shaker.Initialize(body_table, body_floor, chrono.CSYSNORM)
-# my_system.Add(link_shaker)
-
-# ..create the function for imposed x horizontal motion, etc.
-mfunY = chrono.ChFunction_Sine(0,1.5,0.001)  # phase, frequency, amplitude
-mfunY.thisown=0      # because the link will take care of deletion!
-link_shaker.SetMotion_Y(mfunY)
-
-# ..create the function for imposed y vertical motion, etc.
-mfunZ = chrono.ChFunction_Sine(0,1.5,0.12)  # phase, frequency, amplitude
-mfunZ.thisown=0      # because the link will take care of deletion!
-link_shaker.SetMotion_Z(mfunZ)
-
-# Note that you could use other types of ChFunction_ objects, or create
-# your custom function by class inheritance (see demo_python.py), or also
-# set a function for table rotation , etc.
+                # If you want to show shadows because you used "AddLightWithShadow()'
+                # you must remember this:
+    myapplication.AddShadowAll();
 
 
 
+    myapplication.SetStepManage(True)
+    myapplication.SetTimestep(0.001)
+    myapplication.SetTryRealtime(True)
+    return myapplication
 
-# ---------------------------------------------------------------------
-#
-#  Create an Irrlicht application to visualize the system
-#
 
-myapplication = chronoirr.ChIrrApp(my_system)
+# Create the set of bricks in a vertical stack, along Y axis
 
-myapplication.AddTypicalSky('../bin/data/skybox/')
-myapplication.AddTypicalCamera(chronoirr.vector3df(0.5,0.5,1.0))
-myapplication.AddLightWithShadow(chronoirr.vector3df(2,4,2),    # point
-                                 chronoirr.vector3df(0,0,0),    # aimpoint
-                                 9,                 # radius (power)
-                                 1,9,               # near, far
-                                 30)                # angle of FOV
+def create_block(center_x, center_y, center_z, size_x, size_y, size_z, weight):
+    body_brick = chrono.ChBodyShared()
 
-            # ==IMPORTANT!== Use this function for adding a ChIrrNodeAsset to all items
-			# in the system. These ChIrrNodeAsset assets are 'proxies' to the Irrlicht meshes.
-			# If you need a finer control on which item really needs a visualization proxy in
-			# Irrlicht, just use application.AssetBind(myitem); on a per-item basis.
+    body_brick.SetPos(chrono.ChVectorD(center_x, center_y, center_z))
+    body_brick.SetMass(weight)
+    body_brick.SetMaterialSurface(brick_material)
 
-myapplication.AssetBindAll();
+    body_brick.GetCollisionModel().ClearModel()
+    body_brick.GetCollisionModel().AddBox(size_x/2, size_y/2, size_z/2)
+    body_brick.GetCollisionModel().BuildModel()
+    body_brick.SetCollide(True)
 
-			# ==IMPORTANT!== Use this function for 'converting' into Irrlicht meshes the assets
-			# that you added to the bodies into 3D shapes, they can be visualized by Irrlicht!
+    body_brick_shape = chrono.ChBoxShapeShared()
+    body_brick_shape.GetBoxGeometry().Size = chrono.ChVectorD(size_x/2, size_y/2, size_z/2)
+    if center_y%2==0:
+        body_brick_shape.SetColor(chrono.ChColor(0.65, 0.65, 0.6)) # set gray color only for odd bricks
+    body_brick.GetAssets().push_back(body_brick_shape)
 
-myapplication.AssetUpdateAll();
+    return body_brick
 
-            # If you want to show shadows because you used "AddLightWithShadow()'
-            # you must remember this:
-myapplication.AddShadowAll();
 
-# ---------------------------------------------------------------------
-#
-#  Run the simulation
-#
 
-myapplication.SetStepManage(True)
-myapplication.SetTimestep(0.001)
-myapplication.SetTryRealtime(True)
+def check_stable_stack(boxs, draw=True):
+    bricks = []
+    for x, y, z, x_size, y_size, z_size, w in boxs:
+        bricks.append(create_block(x - x_size/2, y - y_size/2, z - z_size/2, x_size, y_size, z_size, w))
 
-while(myapplication.GetDevice().run()):
-    myapplication.BeginScene()
-    myapplication.DrawAll()
-    for substep in range(0,5):
-        myapplication.DoStep()
-    myapplication.EndScene()
+
+    # bricks = [create_block(*k) for k in boxs]
+    [my_system.Add(k) for k in bricks]
+
+    Pos0 = [k.GetPos() for k in bricks]
+
+    myapplication = create_application()    
+
+    index = 0 
+    while(myapplication.GetDevice().run()):
+        index += 1
+        
+        if draw:
+            myapplication.BeginScene()
+            myapplication.DrawAll()
+        
+        for substep in range(0,5):
+            myapplication.DoStep()
+
+        if draw:
+            myapplication.EndScene()
+
+        if index == 100:
+            break
+
+    #import pdb; pdb.set_trace()
+    Pos1 = [k.GetPos() for k in bricks]
+    Rot1 = [k.GetRotAngle() for k in bricks]
+
+    if any([abs(k) > 0.001 for k in Rot1]):
+        # if the blocks rotate, it is not a stable stack
+        return False
+
+    return True
+    # print([str(k) for k in Pos0])
+    # print([str(k) for k in Pos1])
+
+
+
+if __name__ == '__main__':
+    import sys
+
+    if len(sys.argv) > 2:
+        boxs = eval(sys.argv[1])
+        draw = eval(sys.argv[2])
+
+        print(check_stable_stack(boxs, draw))
+
+
+#bricks = [create_block(0, 0, 0, 1, 1, 1, 1), create_block(1, 0, 1, 3, 1, 1, 1), create_block(1, 1, 1, 1, 1, 2, 1)]
+#assert check_stable_stack([ (1, 0, 1, 3, 1, 1, 1), (1, 1, 1, 1, 1, 2, 1)], True) == True
+#assert check_stable_stack([ (1, 0, 1, 3, 1, 1, 1), (1, 1, 1, 1, 1, 3, 1)], True) == False
