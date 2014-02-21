@@ -5,6 +5,9 @@ from random import Random
 from time import time
 
 
+
+
+
 def prng(seed=None):
     """
     設定 Random Number, 如果要 debug, 可以將 Seed 設定成固定數字
@@ -13,7 +16,7 @@ def prng(seed=None):
     if not seed:
         seed = time()
 
-    print "set random seed:", seed
+    print("set random seed:", seed)
 
     prng.seed(seed)
     return prng
@@ -39,6 +42,11 @@ def evaluate(candidates, args):
     """
     fitness = []
     for cs in candidates:
+        # TODO:
+        # 1. based on gene, generate box position
+        # 2. use physical.py to check the box is stable
+        # 3. calcualte the value of these box
+
         fit = 10
         fitness.append(fit)
     return fitness
