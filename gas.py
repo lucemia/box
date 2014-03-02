@@ -1,7 +1,6 @@
 import inspyred
 from inspyred import ec
 import random
-from scipy.optimize import minimize
 
 # http://docs.scipy.org/doc/scipy/reference/tutorial/optimize.html
 # Nelder-Mead
@@ -36,11 +35,13 @@ bound = ec.Bounder(lower_bound, upper_bound)
 
 
 def nm_fitness(ind):
-    import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
     return fitness(ind[0], ind[1], ind[2])[-1]
 
 def nm(population):
-    return minimize(nm_fitness, population[-1], method='nelder-mead')
+    return population[-1]
+    # from scipy.optimize import minimize
+    # return minimize(nm_fitness, population[-1], method='nelder-mead')
 
 class NMPSO(inspyred.swarm.PSO):
     def _swarm_replacer(self, random, population, parents, offspring, args):
@@ -100,7 +101,7 @@ def run_ga():
     #print final_pop
 
     best = max(final_pop)
-    #print('Best Solution: \n{0}'.format(str(best)))
+    print('Best Solution: \n{0}'.format(str(best)))
 
     return final_pop
 
