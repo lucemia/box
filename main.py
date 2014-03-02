@@ -118,12 +118,12 @@ def calculate_weight_distribution(box, overlap_planes):
     # print 'w:', eq0
     # print 'x:', eq1
     # print 'y:', eq2
-    print eqs
+    print(eqs)
 
     try:
         results = solve(eqs, ws)
         #solve爲解聯立eq
-        print 'solve:', results
+        print ('solve:', results)
 
         assert results != []
 
@@ -216,9 +216,9 @@ def check_all_boxes_ok(c_width, c_height, c_depth, boxes):
             return False
 
         # 確認貨物沒有互相碰撞
-        for x in xrange(box.x, box.x + box.width):
-            for y in xrange(box.y, box.y + box.height):
-                for z in xrange(box.z, box.z + box.depth):
+        for x in range(box.x, box.x + box.width):
+            for y in range(box.y, box.y + box.height):
+                for z in range(box.z, box.z + box.depth):
                     if (x, y, z) in space:
                         return False
 
