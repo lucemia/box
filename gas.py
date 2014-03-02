@@ -2,6 +2,7 @@ import inspyred
 from inspyred import ec
 import random
 
+# http://fonnesbeck.github.io/ScipySuperpack/
 # http://docs.scipy.org/doc/scipy/reference/tutorial/optimize.html
 # Nelder-Mead
 
@@ -20,7 +21,7 @@ def fitness(O2_CH4, GV, T):
 def my_evaluator(candidate, args):
     O2_CH4, GV, T = candidate
     f1, f2, f3, d = fitness(O2_CH4, GV, T)
-    # return -d
+
     return ec.emo.Pareto([f1, f2, f3])
 
 lower_bound = [0.25, 10000, 600]
@@ -33,17 +34,29 @@ def generator(random, args):
 
 bound = ec.Bounder(lower_bound, upper_bound)
 
-
 def nm_fitness(ind):
     # import pdb; pdb.set_trace()
     return fitness(ind[0], ind[1], ind[2])[-1]
 
-def nm(population):
-    return population[-1]
-    # from scipy.optimize import minimize
-    # return minimize(nm_fitness, population[-1], method='nelder-mead')
 
 class NMPSO(inspyred.swarm.PSO):
+
+    def nm(self, population):
+        return population[-1]
+
+        from scipy.optimize import minimize
+        p = minimize(nm_fitness, population[-1].candidate, method='nelder-mead')
+        O2_CH4, GV, T = p.x[0], p.x[1], p.x[2]
+
+        ind = inspyred.ec.Individual([O2_CH4, GV, T], maximize=self.maximize)
+        # import pdb; pdb.set_trace()
+
+        ind.candidate = bound(ind.candidate, self._kwargs)
+        ind.fitness = my_evaluator([ind.candidate], self._kwargs)[0]
+        # print ind.fitness
+        return ind
+
+
     def _swarm_replacer(self, random, population, parents, offspring, args):
         n = int(( len(population) - 1 ) / 3)
         # import pdb; pdb.set_trace()
@@ -55,7 +68,7 @@ class NMPSO(inspyred.swarm.PSO):
         population_new = [k[0] for k in population_offspring[:n]]
 
         # the nm is generate by n+1 population
-        population_new.append(nm([k[0] for k in population_offspring[:n+1]]))
+        population_new.append(self.nm([k[0] for k in population_offspring[:n+1]]))
         population_new.extend([k[1] for k in population_offspring[n+1:]])
 
         self._previous_population = [k[0] for k in population_offspring]
@@ -71,7 +84,7 @@ def run_nm_pso():
     final_pop = ea.evolve(
         generator=generator,
         evaluator=my_evaluator,
-        pop_size=100,
+        pop_size=6,
         bounder=bound,
         maximize=True,
         max_evaluations=30000,
@@ -113,7 +126,7 @@ def run_pso():
     final_pop = ea.evolve(
         generator=generator,
         evaluator=my_evaluator,
-        pop_size=100,
+        pop_size=6,
         bounder=bound,
         maximize=True,
         max_evaluations=30000,
@@ -128,8 +141,9 @@ def run_pso():
     return final_pop
 
 run_nm_pso()
-# run_pso()
+run_pso()
 
+# print fitness(0.55, 20000.0, 1099.8115398083803)
 
 # fitness(0.5371872730661065, 19825.600047903703, 915.8655694070546)
 # print fitness(0.413131, 18776, 894.659)
