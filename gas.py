@@ -1,6 +1,10 @@
 import inspyred
 from inspyred import ec
 import random
+from scipy.optimize import minimize
+
+# http://docs.scipy.org/doc/scipy/reference/tutorial/optimize.html
+# Nelder-Mead
 
 prng = random.Random()
 
@@ -17,7 +21,7 @@ def fitness(O2_CH4, GV, T):
 def my_evaluator(candidate, args):
     O2_CH4, GV, T = candidate
     f1, f2, f3, d = fitness(O2_CH4, GV, T)
-    # return d
+    # return -d
     return ec.emo.Pareto([f1, f2, f3])
 
 lower_bound = [0.25, 10000, 600]
@@ -29,6 +33,54 @@ def generator(random, args):
 
 bound = ec.Bounder(lower_bound, upper_bound)
 
+
+def nm_fitness(ind):
+    return my_evaluator(ind, None)
+
+def nm(population):
+    return minimize(nm_fitness, population[-1], method='nelder-mead')
+
+class NMPSO(inspyred.swarm.PSO):
+    def _swarm_replacer(self, random, population, parents, offspring, args):
+        n = ( len(population) - 1 ) / 3
+
+        # the offspring is produced by PSO
+        population_offspring = zip(population, offspring)
+        population_offspring.sort(key=lambda i:i[0], reverse=True)
+
+        # the n elite
+        population_new = [k[0] for k in population_offspring[:n]]
+
+        # the nm is generate by n+1 population
+        population_new.append(nm([k[0] for k in population_offspring[:n+1]]))
+        population_new.extend([k[1] for k in population_offspring[n+1:]])
+
+        self._previous_population = [k[0] for k in population_offspring]
+
+        return population_new
+
+
+def run_nm_pso():
+    ea = NMPSO(prng)
+    ea.terminator = inspyred.ec.terminators.evaluation_termination
+    ea.topology = inspyred.swarm.topologies.ring_topology
+
+    final_pop = ea.evolve(
+        generator=generator,
+        evaluator=my_evaluator,
+        pop_size=100,
+        bounder=bound,
+        maximize=True,
+        max_evaluations=30000,
+        neighborhood_size=5
+    )
+
+    print final_pop
+
+    best = max(final_pop)
+    print('Best Solution: \n{0}'.format(str(best)))
+
+    return final_pop
 
 
 def run_ga():
@@ -72,9 +124,13 @@ def run_pso():
 
     return final_pop
 
-# run_ga()
-run_pso()
+run_nm_pso()
+# run_pso()
 
+
+print fitness(0.5371872730661065, 19825.600047903703, 915.8655694070546)
+# print fitness(0.413131, 18776, 894.659)
+# print fitness(0.420981, 18978, 883.274)
 # print fitness(0.294829, 10054.5, 916.267), [99.131, 45.9225, 0.803374,4.1737]
 # print fitness(0.269169, 10028.6, 837.061), [82.7591, 44.4307, 0.698872, 18.1232]
 # print fitness(0.253618, 10014.8, 706.612), [59.0164, 44.4179, 0.549171, 41.3701]
