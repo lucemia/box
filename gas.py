@@ -28,24 +28,26 @@ lower_bound = [0.25, 10000, 600]
 upper_bound = [0.55, 20000, 1100]
 
 def generator(random, args):
-    print random, args
+    #
+    #  random, args
     return [random.uniform(k[0], k[1]) for k in zip(lower_bound, upper_bound)]
 
 bound = ec.Bounder(lower_bound, upper_bound)
 
 
 def nm_fitness(ind):
-    return my_evaluator(ind, None)
+    import pdb; pdb.set_trace()
+    return fitness(ind[0], ind[1], ind[2])[-1]
 
 def nm(population):
     return minimize(nm_fitness, population[-1], method='nelder-mead')
 
 class NMPSO(inspyred.swarm.PSO):
     def _swarm_replacer(self, random, population, parents, offspring, args):
-        n = ( len(population) - 1 ) / 3
-
+        n = int(( len(population) - 1 ) / 3)
+        # import pdb; pdb.set_trace()
         # the offspring is produced by PSO
-        population_offspring = zip(population, offspring)
+        population_offspring = list(zip(population, offspring))
         population_offspring.sort(key=lambda i:i[0], reverse=True)
 
         # the n elite
@@ -75,7 +77,7 @@ def run_nm_pso():
         neighborhood_size=5
     )
 
-    print final_pop
+    #print final_pop
 
     best = max(final_pop)
     print('Best Solution: \n{0}'.format(str(best)))
@@ -95,10 +97,10 @@ def run_ga():
         max_evaluations=30000,
         num_elites=1)
 
-    print final_pop
+    #print final_pop
 
     best = max(final_pop)
-    print('Best Solution: \n{0}'.format(str(best)))
+    #print('Best Solution: \n{0}'.format(str(best)))
 
     return final_pop
 
@@ -117,7 +119,7 @@ def run_pso():
         neighborhood_size=5
     )
 
-    print final_pop
+    #print final_pop
 
     best = max(final_pop)
     print('Best Solution: \n{0}'.format(str(best)))
@@ -128,7 +130,7 @@ run_nm_pso()
 # run_pso()
 
 
-print fitness(0.5371872730661065, 19825.600047903703, 915.8655694070546)
+# fitness(0.5371872730661065, 19825.600047903703, 915.8655694070546)
 # print fitness(0.413131, 18776, 894.659)
 # print fitness(0.420981, 18978, 883.274)
 # print fitness(0.294829, 10054.5, 916.267), [99.131, 45.9225, 0.803374,4.1737]
