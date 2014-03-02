@@ -61,6 +61,8 @@ class NMPSO(inspyred.swarm.PSO):
 
     def _swarm_replacer(self, random, population, parents, offspring, args):
         n = int(( len(population) - 1 ) / 3)
+        # print [(k.candidate, k.fitness) for k in population]
+
         # import pdb; pdb.set_trace()
         # the offspring is produced by PSO
         population_offspring = list(zip(population, offspring))
@@ -89,7 +91,7 @@ def run_nm_pso():
         pop_size=6,
         bounder=bound,
         maximize=True,
-        max_evaluations=3000,
+        max_evaluations=100,
         neighborhood_size=5
     )
 
@@ -131,7 +133,7 @@ def run_pso():
         pop_size=6,
         bounder=bound,
         maximize=True,
-        max_evaluations=3000,
+        max_evaluations=100,
         neighborhood_size=5
     )
 
@@ -143,13 +145,20 @@ def run_pso():
     return final_pop
 
 popu = run_nm_pso()
+for p in popu:
+    print p, fitness(*p.candidate)
+
+print max(popu)
 best = max(popu)
 
-print best, fitness(best.candidate[0], best.candidate[1], best.candidate[2])
+print best, fitness(*best.candidate)
 
-popu = run_pso()
-best = max(popu)
-print best, fitness(best.candidate[0], best.candidate[1], best.candidate[2])
+# popu = run_pso()
+# best = max(popu)
+# print best, fitness(best.candidate[0], best.candidate[1], best.candidate[2])
+
+
+# import pdb; pdb.set_trace()
 
 # print fitness(0.55, 20000.0, 1099.8115398083803)
 
