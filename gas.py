@@ -22,8 +22,9 @@ def my_evaluator(candidate, args):
     O2_CH4, GV, T = candidate
     f1, f2, f3, d = fitness(O2_CH4, GV, T)
 
-    return d
-    # return ec.emo.Pareto([f1, f2, f3])
+    # return -d
+    return ec.emo.Pareto([f1, f2 *2, 1/f3 * 100])
+    # return ec.emo.Pareto([f1, f2*2, f3*100], [True, True, False])
 
 lower_bound = [0.25, 10000, 600]
 upper_bound = [0.55, 20000, 1100]
@@ -87,37 +88,37 @@ def run_nm_pso():
         evaluator=my_evaluator,
         pop_size=6,
         bounder=bound,
-        maximize=False,
-        max_evaluations=100,
+        maximize=True,
+        max_evaluations=3000,
         neighborhood_size=5
     )
 
     #print final_pop
 
     best = max(final_pop)
-    print('Best Solution: \n{0}'.format(str(best)))
+    # print('Best Solution: \n{0}'.format(str(best)))
 
     return final_pop
 
 
-def run_ga():
-    ea = inspyred.ec.GA(prng)
-    ea.terminator = inspyred.ec.terminators.evaluation_termination
-    final_pop = ea.evolve(
-        generator=generator,
-        evaluator=my_evaluator,
-        pop_size=6,
-        maximize=True,
-        bounder=bound,
-        max_evaluations=100,
-        num_elites=1)
+# def run_ga():
+#     ea = inspyred.ec.GA(prng)
+#     ea.terminator = inspyred.ec.terminators.evaluation_termination
+#     final_pop = ea.evolve(
+#         generator=generator,
+#         evaluator=my_evaluator,
+#         pop_size=6,
+#         maximize=True,
+#         bounder=bound,
+#         max_evaluations=100,
+#         num_elites=1)
 
-    #print final_pop
+#     #print final_pop
 
-    best = max(final_pop)
-    print('Best Solution: \n{0}'.format(str(best)))
+#     best = max(final_pop)
+#     # print('Best Solution: \n{0}'.format(str(best)))
 
-    return final_pop
+#     return final_pop
 
 def run_pso():
     ea = inspyred.swarm.PSO(prng)
@@ -129,20 +130,26 @@ def run_pso():
         evaluator=my_evaluator,
         pop_size=6,
         bounder=bound,
-        maximize=False,
-        max_evaluations=100,
+        maximize=True,
+        max_evaluations=3000,
         neighborhood_size=5
     )
 
     #print final_pop
 
     best = max(final_pop)
-    print('Best Solution: \n{0}'.format(str(best)))
+    # print('Best Solution: \n{0}'.format(str(best)))
 
     return final_pop
 
-print 'nm pso', run_nm_pso()
-print 'pso', run_pso()
+popu = run_nm_pso()
+best = max(popu)
+
+print best, fitness(best.candidate[0], best.candidate[1], best.candidate[2])
+
+popu = run_pso()
+best = max(popu)
+print best, fitness(best.candidate[0], best.candidate[1], best.candidate[2])
 
 # print fitness(0.55, 20000.0, 1099.8115398083803)
 
