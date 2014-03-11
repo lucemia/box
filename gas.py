@@ -3,7 +3,7 @@ from inspyred import ec
 #import random
 import unittest
 #from gas import *
-from random import *
+import random
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
@@ -32,7 +32,8 @@ def my_evaluator(candidate, args):
     f1, f2, f3, d = fitness(O2_CH4, GV, T)
 
     # return -d
-    return ec.emo.Pareto([f1, f2 *2, 1/f3 * 100])
+    return ec.emo.Pareto([f1, f2, 1/f3])
+    # return -d
     #return ec.emo.Pareto([f1, f2, f3], [True, True, False])
     # without normalize [f1, f2, f3] , normalize [f1, f2*2, f3*100]
 
@@ -74,7 +75,7 @@ class NMPSO(inspyred.swarm.PSO):
         # import pdb; pdb.set_trace()
         # the offspring is produced by PSO
         population_offspring = list(zip(population, offspring))
-        import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
         population_offspring.sort(key=lambda i:i[0], reverse=True)
         #define by individual ,i[0]=pop,offspring
 
@@ -90,71 +91,27 @@ class NMPSO(inspyred.swarm.PSO):
         return population_new
 
 
-def run_nm_pso():
-    ea = NMPSO(prng)
+def run_pso(model, pop_size=10, evaluation=500):
+    ea = model(prng)
     ea.terminator = inspyred.ec.terminators.evaluation_termination
     ea.topology = inspyred.swarm.topologies.ring_topology
 
     final_pop = ea.evolve(
         generator=generator,
         evaluator=my_evaluator,
-        pop_size=7,
+        pop_size=pop_size,
         bounder=bound,
         maximize=True,
-        max_evaluations=100,
+        max_evaluations=evaluation,
         neighborhood_size=5
     )
 
-    #print final_pop
-
-    best = max(final_pop)
-    # print('Best Solution: \n{0}'.format(str(best)))
-
     return final_pop
 
-"""
-def run_ga():
-     ea = inspyred.ec.GA(prng)
-     ea.terminator = inspyred.ec.terminators.evaluation_termination
-     final_pop = ea.evolve(
-         generator=generator,
-         evaluator=my_evaluator,
-         pop_size=6,
-         maximize=True,
-         bounder=bound,
-         max_evaluations=100,
-         num_elites=1)
-     print (final_pop)
+# popu = run_pso(inspyred.swarm.PSO, 7, 30)
+popu = run_pso(NMPSO, 7, 300)
 
-     best = max(final_pop)
-     print('Best Solution: \n{0}'.format(str(best)))
 
-     return final_pop
-"""
-def run_pso():
-    ea = inspyred.swarm.PSO(prng)
-    ea.terminator = inspyred.ec.terminators.evaluation_termination
-    ea.topology = inspyred.swarm.topologies.ring_topology
-
-    final_pop = ea.evolve(
-        generator=generator,
-        evaluator=my_evaluator,
-        pop_size=6,
-        bounder=bound,
-        maximize=True,
-        max_evaluations=100,
-        neighborhood_size=5
-    )
-
-    #print final_pop
-
-    best = max(final_pop)
-    # print('Best Solution: \n{0}'.format(str(best)))
-
-    return final_pop
-
-popu = run_nm_pso()
-#p =
 for p in popu:
     print ("Particle=")
     print (p,fitness(*p.candidate))
@@ -166,20 +123,27 @@ best = max(popu)
 print (best, fitness(*best.candidate))
 
 
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
 
-for c, m, zl, zh in [('r', 'o', -50, -25), ('b', '^', -30, -5)]:
-    xs = fitness(*best.candidate)[0]
-    ys = fitness(*best.candidate)[1]
-    zs = fitness(*best.candidate)[2]
-    ax.scatter(xs, ys, zs, c=c, marker=m)
+def plot(popu):
 
-ax.set_xlabel('X=f1 Label')
-ax.set_ylabel('Y=f2 Label')
-ax.set_zlabel('Z=f3 Label')
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
 
-plt.show()
+    #for c, m, zl, zh in [('r', 'o', -50, -25), ('b', '^', -30, -5)]:
+    for p in popu:
+        xs = [fitness(*k.candidate)[0] for k in popu]
+        ys = [fitness(*k.candidate)[1] for k in popu]
+        zs = [fitness(*k.candidate)[2] for k in popu]
+        ax.scatter( ys, xs, zs, c='r', marker='o')
+
+    ax.set_xlabel('X=f1 Label')
+    ax.set_ylabel('Y=f2 Label')
+    ax.set_zlabel('Z=f3 Label')
+
+    plt.show()
+
+plot(popu)
+
 
 # popu = run_pso()
 # best = max(popu)
