@@ -16,6 +16,25 @@ import matplotlib.pyplot as plt
 #random.uniform(k[0], k[1])
 prng = random.Random()
 
+
+def plot(popu):
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    #for c, m, zl, zh in [('r', 'o', -50, -25), ('b', '^', -30, -5)]:
+    for p in popu:
+        xs = [fitness(*k.candidate)[0] for k in popu]
+        ys = [fitness(*k.candidate)[1] for k in popu]
+        zs = [fitness(*k.candidate)[2] for k in popu]
+        ax.scatter( ys, xs, zs, c='r', marker='o')
+
+    ax.set_xlabel('X=f1 Label')
+    ax.set_ylabel('Y=f2 Label')
+    ax.set_zlabel('Z=f3 Label')
+
+    plt.show()
+
 def fitness(O2_CH4, GV, T):
     f1 = (86.74 + 14.6*O2_CH4 - 3.06*GV + 18.82*T + 3.14*O2_CH4*GV - 6.91*O2_CH4**2 - 13.31*T**2)*(-8.87*10**-6)
     f2 = (39.46+5.98*O2_CH4 - 2.4*GV + 13.06*T + 2.5*O2_CH4*GV + 1.64*GV*T-3.9*O2_CH4**2-10.15*T**2-3.69*GV**2*O2_CH4) * (-2.152*10**-9)+45.7
@@ -56,9 +75,7 @@ class NMPSO(inspyred.swarm.PSO):
         from scipy.optimize import minimize
         p = minimize(nm_fitness, population[-1].candidate, method='nelder-mead')
         #[-1] with n+1
-        O2_CH4, GV, T = p.x[0], p.x[1], p.x[2]
-
-        ind = inspyred.ec.Individual([O2_CH4, GV, T], maximize=self.maximize)
+        ind = inspyred.ec.Individual(p.x, maximize=self.maximize)
         # import pdb; pdb.set_trace()
         #maximize=find max )
 
@@ -108,41 +125,31 @@ def run_pso(model, pop_size=10, evaluation=500):
 
     return final_pop
 
-# popu = run_pso(inspyred.swarm.PSO, 7, 30)
-popu = run_pso(NMPSO, 7, 300)
+PSO = inspyred.swarm.PSO
+
+# popu = run_pso(PSO, 7, 30)
+# popu = run_pso(NMPSO, 100, 300)
+
+total_popu = []
+for i in range(1):
+    popu = run_pso(NMPSO, 100, 300)
+    total_popu.extend(popu)
+
+plot(total_popu)
 
 
-for p in popu:
-    print ("Particle=")
-    print (p,fitness(*p.candidate))
-    #print (p,fitness(*p.candidate))
-
-#print (max(popu))
-best = max(popu)
-
-print (best, fitness(*best.candidate))
 
 
+# for p in popu:
+#     print ("Particle=")
+#     print (p,fitness(*p.candidate))
+#     #print (p,fitness(*p.candidate))
 
-def plot(popu):
+# #print (max(popu))
+# best = max(popu)
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
+# print (best, fitness(*best.candidate))
 
-    #for c, m, zl, zh in [('r', 'o', -50, -25), ('b', '^', -30, -5)]:
-    for p in popu:
-        xs = [fitness(*k.candidate)[0] for k in popu]
-        ys = [fitness(*k.candidate)[1] for k in popu]
-        zs = [fitness(*k.candidate)[2] for k in popu]
-        ax.scatter( ys, xs, zs, c='r', marker='o')
-
-    ax.set_xlabel('X=f1 Label')
-    ax.set_ylabel('Y=f2 Label')
-    ax.set_zlabel('Z=f3 Label')
-
-    plt.show()
-
-plot(popu)
 
 
 # popu = run_pso()
