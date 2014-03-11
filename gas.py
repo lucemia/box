@@ -6,6 +6,8 @@ import random
 # http://docs.scipy.org/doc/scipy/reference/tutorial/optimize.html
 # Nelder-Mead
 
+#ruten random float
+#random.uniform(k[0], k[1])
 prng = random.Random()
 
 def fitness(O2_CH4, GV, T):
@@ -17,6 +19,7 @@ def fitness(O2_CH4, GV, T):
 
     return f1, f2, f3, d ** .5
 
+#do evaluate fitness function
 @inspyred.ec.evaluators.evaluator
 def my_evaluator(candidate, args):
     O2_CH4, GV, T = candidate
@@ -24,13 +27,13 @@ def my_evaluator(candidate, args):
 
     # return -d
     return ec.emo.Pareto([f1, f2 *2, 1/f3 * 100])
-    # return ec.emo.Pareto([f1, f2*2, f3*100], [True, True, False])
+    #return ec.emo.Pareto([f1, f2, f3], [True, True, False])
+    # without normalize [f1, f2, f3] , normalize [f1, f2*2, f3*100]
 
 lower_bound = [0.25, 10000, 600]
 upper_bound = [0.55, 20000, 1100]
 
 def generator(random, args):
-    #
     #  random, args
     return [random.uniform(k[0], k[1]) for k in zip(lower_bound, upper_bound)]
 
@@ -44,18 +47,20 @@ def nm_fitness(ind):
 class NMPSO(inspyred.swarm.PSO):
 
     def nm(self, population):
-        return population[-1]
+        #return population[-1]
 
         from scipy.optimize import minimize
         p = minimize(nm_fitness, population[-1].candidate, method='nelder-mead')
+        #[-1] with n+1
         O2_CH4, GV, T = p.x[0], p.x[1], p.x[2]
 
         ind = inspyred.ec.Individual([O2_CH4, GV, T], maximize=self.maximize)
         # import pdb; pdb.set_trace()
+        #maximize=find max )
 
         ind.candidate = bound(ind.candidate, self._kwargs)
         ind.fitness = my_evaluator([ind.candidate], self._kwargs)[0]
-        # print ind.fitness
+        #print (ind.fitness) 
         return ind
 
 
@@ -67,6 +72,7 @@ class NMPSO(inspyred.swarm.PSO):
         # the offspring is produced by PSO
         population_offspring = list(zip(population, offspring))
         population_offspring.sort(key=lambda i:i[0], reverse=True)
+        #define by individual ,i[0]=pop,offspring
 
         # the n elite
         population_new = [k[0] for k in population_offspring[:n]]
@@ -88,7 +94,7 @@ def run_nm_pso():
     final_pop = ea.evolve(
         generator=generator,
         evaluator=my_evaluator,
-        pop_size=6,
+        pop_size=7,
         bounder=bound,
         maximize=True,
         max_evaluations=100,
@@ -102,26 +108,25 @@ def run_nm_pso():
 
     return final_pop
 
+"""
+def run_ga():
+     ea = inspyred.ec.GA(prng)
+     ea.terminator = inspyred.ec.terminators.evaluation_termination
+     final_pop = ea.evolve(
+         generator=generator,
+         evaluator=my_evaluator,
+         pop_size=6,
+         maximize=True,
+         bounder=bound,
+         max_evaluations=100,
+         num_elites=1)
+     print (final_pop)
 
-# def run_ga():
-#     ea = inspyred.ec.GA(prng)
-#     ea.terminator = inspyred.ec.terminators.evaluation_termination
-#     final_pop = ea.evolve(
-#         generator=generator,
-#         evaluator=my_evaluator,
-#         pop_size=6,
-#         maximize=True,
-#         bounder=bound,
-#         max_evaluations=100,
-#         num_elites=1)
+     best = max(final_pop)
+     print('Best Solution: \n{0}'.format(str(best)))
 
-#     #print final_pop
-
-#     best = max(final_pop)
-#     # print('Best Solution: \n{0}'.format(str(best)))
-
-#     return final_pop
-
+     return final_pop
+"""
 def run_pso():
     ea = inspyred.swarm.PSO(prng)
     ea.terminator = inspyred.ec.terminators.evaluation_termination
@@ -145,13 +150,32 @@ def run_pso():
     return final_pop
 
 popu = run_nm_pso()
+#p = 
 for p in popu:
-    print p, fitness(*p.candidate)
+    print ("Particle=")
+    print (p,fitness(*p.candidate))
+    #print (p,fitness(*p.candidate))
 
-print max(popu)
+#print (max(popu))
 best = max(popu)
+      
+print (best, fitness(*best.candidate))
 
-print best, fitness(*best.candidate)
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+for c, m, zl, zh in [('r', 'o', -50, -25), ('b', '^', -30, -5)]:
+    xs = fitness(*best.candidate)[0]
+    ys = fitness(*best.candidate)[1]
+    zs = fitness(*best.candidate)[2]
+    ax.scatter(xs, ys, zs, c=c, marker=m)
+
+ax.set_xlabel('X=f1 Label')
+ax.set_ylabel('Y=f2 Label')
+ax.set_zlabel('Z=f3 Label')
+
+plt.show()
 
 # popu = run_pso()
 # best = max(popu)
