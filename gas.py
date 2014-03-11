@@ -45,10 +45,7 @@ def nm_fitness(ind):
 
 
 class NMPSO(inspyred.swarm.PSO):
-
     def nm(self, population):
-        #return population[-1]
-
         from scipy.optimize import minimize
         p = minimize(nm_fitness, population[-1].candidate, method='nelder-mead')
         #[-1] with n+1
@@ -60,7 +57,7 @@ class NMPSO(inspyred.swarm.PSO):
 
         ind.candidate = bound(ind.candidate, self._kwargs)
         ind.fitness = my_evaluator([ind.candidate], self._kwargs)[0]
-        #print (ind.fitness) 
+        #print (ind.fitness)
         return ind
 
 
@@ -71,6 +68,7 @@ class NMPSO(inspyred.swarm.PSO):
         # import pdb; pdb.set_trace()
         # the offspring is produced by PSO
         population_offspring = list(zip(population, offspring))
+        import pdb; pdb.set_trace()
         population_offspring.sort(key=lambda i:i[0], reverse=True)
         #define by individual ,i[0]=pop,offspring
 
@@ -150,7 +148,7 @@ def run_pso():
     return final_pop
 
 popu = run_nm_pso()
-#p = 
+#p =
 for p in popu:
     print ("Particle=")
     print (p,fitness(*p.candidate))
@@ -158,7 +156,7 @@ for p in popu:
 
 #print (max(popu))
 best = max(popu)
-      
+
 print (best, fitness(*best.candidate))
 
 
