@@ -1,6 +1,12 @@
 import inspyred
 from inspyred import ec
-import random
+#import random
+import unittest
+#from gas import *
+from random import *
+import numpy as np
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
 
 # http://fonnesbeck.github.io/ScipySuperpack/
 # http://docs.scipy.org/doc/scipy/reference/tutorial/optimize.html
