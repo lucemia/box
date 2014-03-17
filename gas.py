@@ -88,7 +88,7 @@ class NMPSO(inspyred.swarm.PSO):
         from scipy.optimize import minimize
         p = minimize(nm_fitness, population[-1].candidate, method='nelder-mead')
         # import pdb; pdb.set_trace()
-        # population[-1].candidate = use last population candidate as 初始值
+        # population[-1].candidate = use last population candidate as default value
         ind = inspyred.ec.Individual([float(k) for k in p.x], maximize=self.maximize)
         # import pdb; pdb.set_trace()
         #maximize=find max )
@@ -113,10 +113,10 @@ class NMPSO(inspyred.swarm.PSO):
         # print(offspring)
         population_offspring = list(zip(population, offspring))
         # import pdb; pdb.set_trace()
-        #print 
+        #print
         # TODO:
         print ([k[0] for k in population_offspring])
-        population_offspring.sort(cmp=lambda i,j: cmp(i[0], j[0]), reverse=True)
+        population_offspring.sort(reverse=True)
         #define by individual ,i[0]=pop,offspring
         print ([k[0] for k in population_offspring])
         # the n elite
