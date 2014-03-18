@@ -26,9 +26,10 @@ def execute(model, p, **kwargs):
 
 ea, final_pop = execute(
     inspyred.swarm.PSO,
+    Gas(),
     #Poloni(),
-    inspyred.benchmarks.DTLZ2,
-    pop_size=100,
+    #inspyred.benchmarks.Kursawe(),
+    pop_size=6,
     max_generations=300,
     neighborhood_size=5,
     archiver=inspyred.ec.archivers.best_archiver,
@@ -39,4 +40,4 @@ ea, final_pop = execute(
 for p in ea.archive:
     print p
 
-plot2D(ea.archive)
+plot3D(ea.archive)
