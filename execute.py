@@ -28,11 +28,9 @@ def execute(model, p, **kwargs):
 ea, final_pop = execute(
     #NMPSO,
     inspyred.swarm.PSO,
-    # Gas(),
-    Poloni(),
-    #SCH(),
     #Gas(),
     Poloni(),
+    #SCH(),
     #inspyred.benchmarks.Kursawe(),
     pop_size=6,
     max_generations=500,
