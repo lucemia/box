@@ -1,6 +1,8 @@
-
+import numpy as np
+from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import csv
 
 
 def plot2D(popu):
@@ -16,7 +18,7 @@ def plot2D(popu):
     ax.set_xlabel('X=f1 Label')
     ax.set_ylabel('Y=f2 Label')
 
-
+    plt.grid(True)
     plt.show()
 
 
@@ -43,3 +45,8 @@ def plot3D(popu):
     #     w = csv.writer(f)
     #     for row in zip(xs, ys, zs):
     #         w.writerow(row)
+    # output fitness of pareto set to csv file
+    with open('ParetoSet.csv', 'w') as f:
+        w = csv.writer(f)
+        for row in zip(xs, ys, zs):
+            w.writerow(row)
