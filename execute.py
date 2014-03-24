@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from utils import *
 from problem import *
 from nm_pso import *
@@ -26,23 +27,28 @@ def execute(model, p, **kwargs):
     return ea, final_pop
 
 ea, final_pop = execute(
-    #NMPSO,
-    inspyred.swarm.PSO,
-    #Gas(),
-    Poloni(),
+    NMPSO,
+    #inspyred.swarm.PSO,
+    Gas(),
+    #Poloni(),
     #SCH(),
+    #Viennet(),
     #inspyred.benchmarks.Kursawe(),
-    pop_size=6,
-    max_generations=500,
+    #inspyred.benchmarks.DTLZ6(),
+    pop_size=50,
+    max_generations=10,
     neighborhood_size=5,
     archiver=inspyred.ec.archivers.best_archiver,
     terminator=inspyred.ec.terminators.generation_termination,
     topology=inspyred.swarm.topologies.ring_topology
+    #import pdb; pdb.set_trace()
 )
-#import pdb; pdb.set_trace()
+
 for p in ea.archive:
     print (p)
+    #print 'pop='
+    #print (problem.evaluator.fitness)
 
-plot2D(ea.archive)
-#plot3D(ea.archive)
+#plot2D(ea.archive)
+plot3D(ea.archive)
 

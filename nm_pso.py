@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import collections
 import copy
 import inspyred
@@ -15,7 +16,8 @@ from problem import *
 
 def nm_fitness(ind):
     # import pdb; pdb.set_trace()
-    return fitness(ind[0], ind[1], ind[2])[-1]
+    #ind = evaluator.fitness
+    return (ind[0], ind[1], ind[2])[-1]
 
 class NMPSO(inspyred.swarm.PSO):
 

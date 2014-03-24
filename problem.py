@@ -1,4 +1,4 @@
-import math
+# -*- coding: utf-8 -*-
 from inspyred.benchmarks import *
 import copy
 import inspyred
@@ -35,6 +35,13 @@ def SCH_func(x):
     f2 = (x-2)**2
     
     return f1, f2
+
+def Viennet_func(x,y):
+    f1 = 0.5*(x**2 + y**2) + math.sin(x**2 + y**2)
+    f2 = ((3*x-2*y+4)**2)/8 + ((x-y+1)**2)/27 + 15
+    f3 = 1/((x**2+y**2+1)) - 1.1*math.exp(-(x**2+y**2))
+    
+    return f1, f2, f3
 
 class Gas(Benchmark):
     def __init__(self):
@@ -91,4 +98,19 @@ class SCH(Benchmark):
 
         return fitness
 
+class Viennet(Benchmark):
+    def __init__(self):
+        Benchmark.__init__(self, dimensions=2, objectives=3)
+        self.bounder = ec.Bounder([-3,3], [-3,3])
+        self.maximize = False
 
+    def generator(self, random, args):
+        return [random.uniform(k[0], k[1]) for k in zip([-3,3], [-3,3])]
+
+    def evaluator(self, candidates, args):
+        fitness = []
+        for c in candidates:
+            f1, f2, f3 = Viennet_func(*c)
+            fitness.append(emo.Pareto((f1, f2, f3)))
+
+        return fitness
