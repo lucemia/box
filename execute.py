@@ -23,12 +23,13 @@ def execute(model, p, **kwargs):
         maximize=p.maximize,
         **kwargs
     )
+    # final_pop store last partical evaluation location
 
     return ea, final_pop
 
 ea, final_pop = execute(
-    NMPSO,
-    #inspyred.swarm.PSO,
+    #NMPSO,
+    inspyred.swarm.PSO,
     Gas(),
     #Poloni(),
     #SCH(),
@@ -45,10 +46,15 @@ ea, final_pop = execute(
 )
 
 for p in ea.archive:
+    #print (p)
     print (p)
+    #var = p.candidates
+    #fitness = p.fitness
+    #distance = p.
+    #print (var)
+
     #print 'pop='
     #print (problem.evaluator.fitness)
 
 #plot2D(ea.archive)
 plot3D(ea.archive)
-
