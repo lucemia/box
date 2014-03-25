@@ -10,50 +10,136 @@ from random import *
 from time import *
 from problem import *
 
+
 #-----------------------------------------------------------------------
 #                               nm-pso
 #-----------------------------------------------------------------------
 
-def nm_fitness(ind):
-    # import pdb; pdb.set_trace()
-    #ind = evaluator.fitness
-    return (ind[0], ind[1], ind[2])[-1]
+def _op(candidate_a, candidate_b, var):
+    return map(lambda a, b: a + var * (a - b), candidate_a, candidate_b)
+
+def _ind(candidate, maximize, fitness):
+    ind = ec.Individual(candidate, maximize=maximize)
+    ind.fitness = fitness
+    return ind
 
 class NMPSO(inspyred.swarm.PSO):
+    # def __init__(self, rand):
 
-    def nm(self, population):
-        #return population[-1]
-        from scipy.optimize import minimize
-        p = minimize(nm_fitness, population[-1].candidate, method='nelder-mead')
-        # population[-1].candidate = use last population candidate as 初始值
-        #import pdb; pdb.set_trace()
-        O2_CH4, GV, T = p.x[0], p.x[1], p.x[2]
-        ind = inspyred.ec.Individual([O2_CH4, GV, T], maximize=self.maximize)
+    #     super(inspyred.swarm.PSO, self).__init__(rand)
+    #     self._swarm_variator = self.variator
+    #     self.variator = self._nm_swarm_variator
+
+    def _swarm_variator(self, random, candidates, args):
+        popu_size = len(candidates)
+        n = int(( popu_size - 1 ) / 3)
+
         # import pdb; pdb.set_trace()
-        # maximize = find max for ind
-        # redefine a new bound for nm , do not use old bound
-        ind.candidate = bound(ind.candidate, self._kwargs)
-        ind.fitness = my_evaluator([ind.candidate], self._kwargs)[0]
-        #print (ind) 
-        return ind
+        offspring = super(NMPSO, self)._swarm_variator(random, candidates, args)
+        temp = [(self._previous_population[k], k) for k in range(popu_size)]
 
+        temp.sort(reverse=True)
+        rank = [k[1] for k in temp]
 
-    def _swarm_replacer(self, random, population, parents, offspring, args):
-        n = int(( len(population) - 1 ) / 3)
-        # print [(k.candidate, k.fitness) for k in population]
+        # print rank
+        # the n previous parents will remain not change
+        for index in rank[:n]:
+            offspring[index] = self._previous_population[index].candidate
+
+        # the n + 1 use nm
+
+        self._t = 100
+        offspring[n+1] = self.nm([self._previous_population[index] for index in rank[:n+1]], args).candidate
+
+        # the remain use pso
+        return offspring
+
+    def nm(self, population, args):
+        alpha = args.setdefault('alpha', 1)
+        gamma = args.setdefault('gamma', 2)
+        sigma = args.setdefault('sigma', 0.5)
+        rho = args.setdefault('rho', -0.5)
+        # theta = args.setdefault('theta', 0.1)
+
+        fitness = lambda ind: self.evaluator([ind], args)[0]
+
+        # http://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method
+
+        popu_size = len(population)
+        # 1. Order according to the values at the vertices
+        population.sort(reverse=True)
+
+        # Stopping Criterion
+        self._t -= 1
+        if not self._t > 0:
+            return population[0]
+
+        # 2. Calculate X0, the center of gravity of all points except Xn+1
         # import pdb; pdb.set_trace()
-        # the offspring is produced by PSO , it is use to replace
-        population_offspring = list(zip(population, offspring))
-        population_offspring.sort(key=lambda i:i[0], reverse=True)
-        # define by individual , i[0] = pop,offspring
 
-        # the n elite
-        population_new = [k[0] for k in population_offspring[:n]]
-        #print (population_new[0])
-        # the nm is generate by n+1 population
-        population_new.append(self.nm([k[0] for k in population_offspring[:n+1]]))
-        population_new.extend([k[1] for k in population_offspring[n+1:]])
+        X_0 = [sum(k) / (popu_size-1) for k in zip(*(p.candidate for p in population[:-1]))]
+        # the Xn+1
+        X_N_1 = population[-1].candidate
+        # 3. Reflection
+        # Compute the reflected point
+        X_R = _op(X_0, X_N_1, alpha)
+        X_N = population[-2].candidate
+        # fit_reflection = evaluate(X_R)
 
-        self._previous_population = [k[0] for k in population_offspring]
+        # if the reflected point is better than the second worst, but not better than the best
+        # then obtain a new simplex by replacing the worst point Xn+1 with the reflected point Xr
+        # and go to step 1
+        if fitness(X_0) >= fitness(X_R) > fitness(X_N):
+            population[-1] = _ind(X_R, self.maximize, fitness(X_R))
+            # print "reflection"
+            return self.nm(population, args)
 
-        return population_new
+        # 4. Expansion
+        # if the reflected point is the best point so far
+        elif fitness(X_R) > fitness(X_0):
+            # then compute the expanded point
+            X_E = _op(X_0, X_N_1, gamma)
+            # print "expansion"
+
+            # if the expanded point is better than the reflected point
+            if fitness(X_E) > fitness(X_R):
+                # then obtain a new simplex by replacing the
+                # worst point Xn+1 with the expanded point Xe, and go to step 1.
+                population[-1] = _ind(X_E, self.maximize, fitness(X_E))
+                return self.nm(population, args)
+            else:
+                # else obtain a new simplex by replacing the worst point Xn+1
+                # with the reflected point Xr and go to step 1.
+                population[-1] = _ind(X_R, self.maximize, fitness(X_R))
+                return self.nm(population, args)
+        # 5. Contraction
+        # Here, it is certain that
+        elif fitness(X_R) <= fitness(X_N):
+            # print "contraction"
+            # Compute contracted point
+            X_C = _op(X_0, X_N_1, rho)
+
+            # if the contracted point is better than the worst point
+            if fitness(X_C) > fitness(X_N_1):
+                # then obtain a new simplex by replacing the worst point
+                # Xn+1 with the contracted point Xc and go to step 1.
+                population[-1] = _ind(X_C, self.maximize, fitness(X_C))
+                return self.nm(population, args)
+
+            # else go to step 6.
+            # 6. Reduction / Shrink
+            else:
+                # print "reduction"
+                # for all but the best point
+                # replace the point with
+                new_population = []
+                new_population.append(population[0])
+
+                for popu in population[1:]:
+                    X_I = _op(X_0, popu.candidate, sigma)
+                    new_population.append(_ind(X_I, self.maximize, fitness(X_I)))
+
+                # goto step 1.
+                return self.nm(new_population, args)
+
+

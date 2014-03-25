@@ -13,7 +13,7 @@ def execute(model, p, **kwargs):
     ea = model(prng)
 
     ea.terminator = kwargs.get('terminator')
-    ea.archiver = kwargs.get('archiver')
+    # ea.archiver = kwargs.get('archiver')
     ea.topology = kwargs.get('topology')
 
     final_pop = ea.evolve(
@@ -27,10 +27,10 @@ def execute(model, p, **kwargs):
     return ea, final_pop
 
 ea, final_pop = execute(
-    # NMPSO,
-    inspyred.swarm.PSO,
+    NMPSO,
+    # inspyred.swarm.PSO,
     Gas(),
-    #Poloni(),
+    # Poloni(),
     #SCH(),
     #Viennet(),
     #inspyred.benchmarks.Kursawe(),
@@ -38,13 +38,14 @@ ea, final_pop = execute(
     pop_size=50,
     max_generations=10,
     neighborhood_size=5,
-    archiver=inspyred.ec.archivers.best_archiver,
+    # archiver=inspyred.ec.archivers.best_archiver,
     terminator=inspyred.ec.terminators.generation_termination,
     topology=inspyred.swarm.topologies.ring_topology
     #import pdb; pdb.set_trace()
 )
+print len(final_pop)
 
-export(ea.archive, gas_func)
+# export(ea.archive, gas_func)
 
 
 
