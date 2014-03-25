@@ -33,14 +33,14 @@ def Poloni_func(x, y):
 def SCH_func(x):
     f1 = (x)**2
     f2 = (x-2)**2
-    
+
     return f1, f2
 
 def Viennet_func(x,y):
     f1 = 0.5*(x**2 + y**2) + math.sin(x**2 + y**2)
     f2 = ((3*x-2*y+4)**2)/8 + ((x-y+1)**2)/27 + 15
     f3 = 1/((x**2+y**2+1)) - 1.1*math.exp(-(x**2+y**2))
-    
+
     return f1, f2, f3
 
 class Gas(Benchmark):
@@ -56,7 +56,11 @@ class Gas(Benchmark):
         fitness = []
         for c in candidates:
             f1, f2, f3, d = gas_func(*c)
-            fitness.append(emo.Pareto((f1, f2, 1/f3)))
+            # f1 should not over 100, so we add penalty to candidate which f1 over 100
+            if f1 < 100:
+                fitness.append(emo.Pareto((f1, f2, 1/f3)))
+            else:
+                fitness.append(emo.Pareto((0, f2, 1/f3)))
 
         return fitness
 

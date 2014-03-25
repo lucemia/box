@@ -27,8 +27,8 @@ def execute(model, p, **kwargs):
     return ea, final_pop
 
 ea, final_pop = execute(
-    NMPSO,
-    #inspyred.swarm.PSO,
+    # NMPSO,
+    inspyred.swarm.PSO,
     Gas(),
     #Poloni(),
     #SCH(),
@@ -44,10 +44,9 @@ ea, final_pop = execute(
     #import pdb; pdb.set_trace()
 )
 
-for p in ea.archive:
-    print (p)
-    #print 'pop='
-    #print (problem.evaluator.fitness)
+export(ea.archive, gas_func)
+
+
 
 #plot2D(ea.archive)
 plot3D(ea.archive)

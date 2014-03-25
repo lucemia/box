@@ -42,8 +42,20 @@ def plot3D(popu):
 
     plt.show()
 
-    # output fitness of pareto set to csv file
+    # # output fitness of pareto set to csv file
+    # with open('ParetoSet.csv', 'w') as f:
+    #     w = csv.writer(f)
+    #     for row in zip(xs, ys, zs):
+    #         w.writerow(row)
+
+def export(popu, fitness_func):
     with open('ParetoSet.csv', 'w') as f:
-        w = csv.writer(f)
-        for row in zip(xs, ys, zs):
-            w.writerow(row)
+        f = csv.writer(f)
+        for p in popu:
+            var = list(p.candidate)
+            fitness = list(p.fitness)
+            result = list(fitness_func(*var))
+
+            f.writerow(var + fitness + result)
+
+
