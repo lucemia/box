@@ -105,11 +105,11 @@ class SCH(Benchmark):
 class Viennet(Benchmark):
     def __init__(self):
         Benchmark.__init__(self, dimensions=2, objectives=3)
-        self.bounder = ec.Bounder([-3,3], [-3,3])
+        self.bounder = ec.Bounder([-3,-3], [3,3])
         self.maximize = False
 
     def generator(self, random, args):
-        return [random.uniform(k[0], k[1]) for k in zip([-3,3], [-3,3])]
+        return [random.uniform(k[0], k[1]) for k in zip([-3,-3], [3,3])]
 
     def evaluator(self, candidates, args):
         fitness = []
