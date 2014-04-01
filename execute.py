@@ -7,7 +7,7 @@ from random import *
 from time import *
 
 prng = Random()
-prng.seed(time())
+
 
 def best_observer(population, num_generations, num_evaluations, args):
     # print len(archive)
@@ -56,8 +56,11 @@ def execute(model, p, **kwargs):
 
     return ea, final_pop
 
+
 f = {}
 for a in (inspyred.swarm.PSO, NMPSO):
+    prng.seed(0)
+
     print a
     total = 0
     for i in range(1):
@@ -68,10 +71,10 @@ for a in (inspyred.swarm.PSO, NMPSO):
             a,
             # Rosen(),
             # inspyred.swarm.PSO,
-            # Gas_D(),
+            Gas_D(),
             # Poloni(),
             # SCH(),
-            Gas_D(),
+            # Gas(),
             # Viennet(),
             #inspyred.benchmarks.Kursawe(),
             #inspyred.benchmarks.DTLZ6(),
@@ -91,15 +94,15 @@ for a in (inspyred.swarm.PSO, NMPSO):
 
     # print f.keys()
 
-
+        # plot3D(archive)
     print total
 
+# print f[inspyred.swarm.PSO]
 plotFitness(f[inspyred.swarm.PSO], f[NMPSO])
 
     # print max(archive)
 # export(archive, gas_func)
 # print archive
 
-# plot2D(archive)
-# plot3D(archive)
+
 
