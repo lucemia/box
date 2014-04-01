@@ -43,6 +43,24 @@ def Viennet_func(x,y):
 
     return f1, f2, f3
 
+class Rosen(Benchmark):
+    def __init__(self):
+        Benchmark.__init__(self, dimensions=3, objectives=1)
+        self.maximize = False
+
+    def generator(self, random, args):
+        return [random.uniform(0, 2) for k in range(self.dimensions)]
+
+    def evaluator(self, candidates, args):
+        import numpy as np
+        fitness = []
+        for x in candidates:
+            x = np.array(x)
+            fitness.append(emo.Pareto([float(sum(100.0*(x[1:]-x[:-1]**2.0)**2.0 + (1-x[:-1])**2.0))]))
+
+        return fitness
+
+
 class Gas(Benchmark):
     def __init__(self):
         Benchmark.__init__(self, dimensions=3, objectives=3)
