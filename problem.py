@@ -61,6 +61,29 @@ class Rosen(Benchmark):
         return fitness
 
 
+
+class Gas_D(Benchmark):
+    def __init__(self):
+        Benchmark.__init__(self, dimensions=3, objectives=1)
+        self.bounder = ec.Bounder([0.25, 10000, 600], [0.55, 20000, 1100])
+        self.maximize = False
+
+    def generator(self, random, args):
+        return [random.uniform(k[0], k[1]) for k in zip([0.25, 10000, 600], [0.55, 20000, 1100])]
+
+    def evaluator(self, candidates, args):
+        fitness = []
+        for c in candidates:
+            f1, f2, f3, d = gas_func(*c)
+            fitness.append(emo.Pareto([d]))
+            # f1 should not over 100, so we add penalty to candidate which f1 over 100
+            # if f1 < 100:
+            #     fitness.append(emo.Pareto((f1, f2, 1/f3)))
+            # else:
+            #     fitness.append(emo.Pareto((0, f2, 1/f3)))
+
+        return fitness
+
 class Gas(Benchmark):
     def __init__(self):
         Benchmark.__init__(self, dimensions=3, objectives=3)

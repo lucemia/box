@@ -9,11 +9,10 @@ from time import *
 prng = Random()
 prng.seed(time())
 
-
-archive = []
 def best_observer(population, num_generations, num_evaluations, args):
     # print len(archive)
-    global archive
+    global archive, fitness
+    # print _archive
     # import pdb; pdb.set_trace()
     new_archive = archive
     for ind in population:
@@ -30,13 +29,15 @@ def best_observer(population, num_generations, num_evaluations, args):
                     should_add = False
                 elif ind > a:
                     should_remove.append(a)
+
             for r in should_remove:
                 new_archive.remove(r)
             if should_add:
                 new_archive.append(ind)
-
     archive = new_archive
 
+    # fitness.append([max(archive).fitness, min(archive).fitness])
+    fitness.append([min([gas_func(*p.candidate)[-1] for p in archive])])
 
 def execute(model, p, **kwargs):
     ea = model(prng)
@@ -55,27 +56,50 @@ def execute(model, p, **kwargs):
 
     return ea, final_pop
 
-ea, final_pop = execute(
-    # NMPSO,
-    inspyred.swarm.PSO,
-    # Gas(),
-    # Poloni(),
-    # SCH(),
-    Viennet(),
-    #inspyred.benchmarks.Kursawe(),
-    #inspyred.benchmarks.DTLZ6(),
-    pop_size=50,
-    max_generations=100,
-    neighborhood_size=5,
-    observer=[best_observer],
-    # archiver=best_archiver,
-    terminator=inspyred.ec.terminators.generation_termination,
-    topology=inspyred.swarm.topologies.ring_topology
-)
-# print len(final_pop)
-print (len(archive))
+f = {}
+for a in (inspyred.swarm.PSO, NMPSO):
+    print a
+    total = 0
+    for i in range(1):
+        archive = []
+        fitness = []
+
+        ea, final_pop = execute(
+            a,
+            # Rosen(),
+            # inspyred.swarm.PSO,
+            # Gas_D(),
+            # Poloni(),
+            # SCH(),
+            Gas_D(),
+            # Viennet(),
+            #inspyred.benchmarks.Kursawe(),
+            #inspyred.benchmarks.DTLZ6(),
+            pop_size=7,
+            max_generations=100,
+            neighborhood_size=5,
+            observer=[best_observer],
+            # archiver=best_archiver,
+            terminator=inspyred.ec.terminators.generation_termination,
+            topology=inspyred.swarm.topologies.ring_topology
+        )
+        # print len(final_pop)
+        # print (len(archive))
+        total += len(archive)
+
+        f[a] = fitness[:]
+
+    # print f.keys()
+
+
+    print total
+
+plotFitness(f[inspyred.swarm.PSO], f[NMPSO])
+
+    # print max(archive)
 # export(archive, gas_func)
+# print archive
 
 # plot2D(archive)
-plot3D(archive)
+# plot3D(archive)
 

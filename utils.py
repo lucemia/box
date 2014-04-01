@@ -6,6 +6,25 @@ from mpl_toolkits.mplot3d import Axes3D
 import csv
 
 
+def plotFitness(*fitnesses):
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    for fitness, c in zip(fitnesses, ('r', 'g', 'b')):
+        xs = [k for k in range(len(fitness))]
+        ys1 = [f[0] for f in fitness]
+        # ys2 = [f[1] for f in fitness]
+
+        ax.scatter(xs, ys1, c=c, marker='o')
+        # ax.scatter(xs, ys2, c='b', marker='o')
+
+    ax.set_xlabel('X=f1 Label')
+    ax.set_ylabel('y=f2 Label')
+
+    plt.grid(True)
+    plt.show()
+
+
 def plot2D(popu):
     fig = plt.figure()
     ax = fig.add_subplot(111)

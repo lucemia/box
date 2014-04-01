@@ -52,9 +52,9 @@ class NMPSO(inspyred.swarm.PSO):
 
         # the n + 1 use nm
 
-        self._t = 10
-        offspring[n+1] = self.nm([self._previous_population[index] for index in rank[:n+1]], args).candidate
-        offspring[n+1] = self.bounder(offspring[n+1], args)
+        self._t = 100
+        offspring[rank[n+1]] = self.nm([self._previous_population[index] for index in rank[:n+1]], args).candidate
+        offspring[rank[n+1]] = self.bounder(offspring[rank[n+1]], args)
         # the remain use pso
         return offspring
 
